@@ -1,24 +1,30 @@
 const mysql = require('mysql2');
 
-// Create connection pool
+// Connection pool with Environment Variables
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'chetanmysql', // Default XAMPP/MySQL password is empty
-  database: 'truthvision',
+  // Railway par ye values process.env se aayengi, 
+  // laptop par ye default 'localhost' aur 'root' use karega.
+  host: process.env.MYSQLHOST || 'localhost',
+  user: process.env.MYSQLUSER || 'root',
+  password: process.env.MYSQLPASSWORD || 'chetanmysql',
+  database: process.env.MYSQLDATABASE || 'truthvision',
+  port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-// Test connection (optional, comment out if DB not available)
+// Use promise wrapper for async/await (Modern and cleaner)
+const promisePool = pool.promise();
+
+// Test connection
 pool.getConnection((err, connection) => {
   if (err) {
-    console.error('Database connection failed:', err);
+    console.error('Database connection failed:', err.message);
     return;
   }
-  console.log('Connected to MySQL database');
+  console.log('Connected to MySQL database!');
   connection.release();
 });
 
-module.exports = pool;
+module.exports = promisePool;
