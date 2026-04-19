@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('userId', userData.id || 'anonymous');
 
                 // Call actual API for real detection
-                response = await fetch('/api/verify', {
+                response = await fetch('https://truthvision-ai.up.railway.app/api/verify', {
                     method: 'POST',
                     body: formData
                 });
