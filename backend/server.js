@@ -43,6 +43,18 @@ const upload = multer({
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// CORS Configuration
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
 app.use(express.static(path.join(__dirname, '..')));
 
 // --- HTML Routes ---
@@ -60,27 +72,36 @@ app.post('/api/signup', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const query = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
-        db.query(query, [username, email, hashedPassword], (err, result) => {
-            if (err) {
-                if (err.code === 'ER_DUP_ENTRY') return res.status(400).json({ message: 'Email already exists' });
-                return res.status(500).json({ message: 'Database error' });
-            }
-            res.status(201).json({ message: 'Signup successful' });
-        });
-    } catch (e) { res.status(500).json({ message: 'Server error' }); }
+        await db.query(query, [username, email, hashedPassword]);
+        res.status(201).json({ message: 'Signup successful' });
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') return res.status(400).json({ message: 'Email already exists' });
+        console.error('Signup error:', err);
+        res.status(500).json({ message: 'Database error' });
+    }
 });
 
 // 2. Login API
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    const query = 'SELECT * FROM users WHERE email = ?';
-    db.query(query, [email], async (err, results) => {
-        if (err || results.length === 0) return res.status(401).json({ message: 'Invalid credentials' });
+    try {
+        const query = 'SELECT * FROM users WHERE email = ?';
+        const [results] = await db.query(query, [email]);
+        
+        if (!results || results.length === 0) return res.status(401).json({ message: 'Invalid credentials' });
 
         const user = results[0];
         const isMatch = await bcrypt.compare(password, user.password);
         if (isMatch) {
             res.json({ message: 'Login successful', user: { id: user.id, username: user.username } });
+        } else {
+            res.status(401).json({ message: 'Invalid credentials' });
+        }
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
         } else {
             res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -131,18 +152,18 @@ app.post('/api/verify', upload.single('mediaFile'), async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, NOW())
         `;
 
-        db.query(reportQuery, [
-            userId,
-            filename,
-            filePath,
-            score,
-            classification,
-            JSON.stringify(detectionDetails)
-        ], (err) => {
-            if (err) {
-                console.error('Database Error:', err);
-            }
-        });
+        try {
+            await db.query(reportQuery, [
+                userId,
+                filename,
+                filePath,
+                score,
+                classification,
+                JSON.stringify(detectionDetails)
+            ]);
+        } catch (dbErr) {
+            console.error('Database Error:', dbErr);
+        }
 
         const report = {
             id: Date.now(),
@@ -309,27 +330,33 @@ app.listen(PORT, () => {
 // Additional API endpoints
 
 // Get detection history for user
-app.get('/api/history/:userId', (req, res) => {
+app.get('/api/history/:userId', async (req, res) => {
     const { userId } = req.params;
     const query = 'SELECT id, filename, authenticity_score, classification, created_at FROM detection_reports WHERE user_id = ? ORDER BY created_at DESC LIMIT 50';
     
-    db.query(query, [userId], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Database error' });
+    try {
+        const [results] = await db.query(query, [userId]);
         res.json(results);
-    });
+    } catch (err) {
+        console.error('History error:', err);
+        res.status(500).json({ message: 'Database error' });
+    }
 });
 
 // Get detection details
-app.get('/api/report/:reportId', (req, res) => {
+app.get('/api/report/:reportId', async (req, res) => {
     const { reportId } = req.params;
     const query = 'SELECT * FROM detection_reports WHERE id = ?';
     
-    db.query(query, [reportId], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Database error' });
+    try {
+        const [results] = await db.query(query, [reportId]);
         if (results.length === 0) return res.status(404).json({ message: 'Report not found' });
         
         const report = results[0];
         report.detection_details = JSON.parse(report.detection_details);
         res.json(report);
-    });
+    } catch (err) {
+        console.error('Report error:', err);
+        res.status(500).json({ message: 'Database error' });
+    }
 });
