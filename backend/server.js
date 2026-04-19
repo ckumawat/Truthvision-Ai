@@ -102,11 +102,7 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-        } else {
-            res.status(401).json({ message: 'Invalid credentials' });
-        }
-    });
-});
+        
 
 // 3. AI Detector API - Local Node.js image analysis
 app.post('/api/verify', upload.single('mediaFile'), async (req, res) => {
