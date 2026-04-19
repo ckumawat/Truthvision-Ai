@@ -1,0 +1,26 @@
+{
+  "name": "truthvision-ai",
+  "version": "1.0.0",
+  "description": "TruthVision AI web application",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "exif-parser": "^0.1.12",
+    "express": "^4.22.1",
+    "fft-js": "^0.0.12",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.0",
+    "sharp": "^0.32.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

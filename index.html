@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthVision AI - Content Verification Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="main-body">
+    
+    <script>
+        // Check authentication status
+        if (localStorage.getItem('isAuthenticated') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <div class="background-effect"></div>
+
+    <header class="figma-header">
+        <div class="logo">
+           <img src="AI_Deepfake_Detector_Logo1.png" alt="AI Deepfake Detector Logo" class="custom-logo">
+            <h1>TruthVision AI</h1>
+        </div>
+        <nav>
+            <a href="#detector" class="nav-link">Detector</a>
+            <a href="#capabilities" class="nav-link">Features</a>
+            <a href="#workflow" class="nav-link">Workflow</a>
+            <a href="#use-cases" class="nav-link">Use Cases</a>
+            <a href="#future" class="nav-link">Future</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </nav>
+        
+        <div class="header-action">
+            <div class="search-container">
+                <button class="search-icon-btn" id="search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div class="search-input-container" id="search-input-container">
+                    <input type="text" id="search-input" placeholder="Search DeepScan...">
+                    <button class="search-close-btn" id="search-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="user-menu">
+                <button class="hamburger-btn" id="hamburger-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <div class="menu-item" onclick="openProfile()">
+                        <i class="fas fa-user"></i> My Profile
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="detector" class="detector-section section-glow" data-animation="fade-in">
+            <div class="section-content-wrapper">
+                <h2>AI Content Analyzer: Instant Verification</h2>
+                <p class="description-text">Our state-of-the-art AI provides real-time analysis for text, media, and third-party applications. **Trust the Scan.**</p>
+                
+                <div class="detection-panel-3d">
+                    <div class="panel-inner">
+                        <div class="tabs">
+                            <button class="tab-button active glow-button" data-type="text"><i class="fas fa-file-alt"></i> Text / URL</button>
+                            <button class="tab-button glow-button" data-type="media"><i class="fas fa-camera"></i> Image / Video</button>
+                            <button class="tab-button glow-button" data-type="app"><i class="fas fa-mobile-alt"></i> Third-Party App</button>
+                        </div>
+
+                        <div id="text-input-area" class="input-area active">
+                            <textarea id="text-input" placeholder="Paste article, content, or URL for analysis (e.g., news headlines, political statements)..."></textarea>
+                            <button id="submit-text" class="submit-btn glow-button motion-element"><i class="fas fa-search"></i> Analyze Content</button>
+                        </div>
+
+                        <div id="media-input-area" class="input-area">
+                            <div id="drop-area" class="drop-area motion-element">
+                                <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                <p>Drag media here or <strong>Choose File</strong></p>
+                                <input type="file" id="file-upload" accept="image/*,video/*" hidden>
+                                <button class="choose-file-btn glow-button" type="button" onclick="document.getElementById('file-upload').click()">Choose File</button>
+                            </div>
+                            <div id="image-preview" class="image-preview hidden">
+                                <img id="preview-img" src="" alt="Image Preview">
+                                <div id="scan-overlay" class="scan-overlay hidden">
+                                    <div class="scan-line"></div>
+                                </div>
+                            </div>
+                            <div id="file-name-display" class="file-info">No file selected.</div>
+                            <button id="submit-media" class="submit-btn glow-button motion-element" disabled><i class="fas fa-video"></i> Analyze Media</button>
+                        </div>
+
+                        <div id="app-input-area" class="input-area">
+                            <input type="text" id="app-input" placeholder="Enter App Name or Package ID (e.g., com.example.malwareapp)">
+                            <button id="submit-app" class="submit-btn glow-button motion-element"><i class="fas fa-bug"></i> Scan App Security</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="results-container" class="results-container hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">🔍 Scan Results: <span id="result-text">Authenticity Score</span></h3>
+                        <button id="close-results" class="close-results-btn" title="Close Results">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="result-score" class="result-score"></div>
+                    <div id="result-details" class="result-details"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="introduction" class="section-dark" data-animation="slide-up">
+            <div class="section-content-wrapper description-block">
+                <h3>💡 Introduction to TruthVision AI: Combating Digital Deception</h3>
+                <p>Welcome to TruthVision AI, a powerful, multi-modal content verification system designed to restore trust in the digital ecosystem. In an era dominated by AI-generated content and rampant misinformation (deepfakes, synthetic text, propaganda), the need for a robust and reliable detection tool is paramount. Our platform provides a critical defence layer, allowing users—from journalists and researchers to general consumers—to instantly verify the authenticity and integrity of information they encounter online. </p>
+                <p>TruthVision AI utilizes a sophisticated blend of **Natural Language Processing (NLP)**, **Computer Vision (CV)**, and **Behavioral Analysis** algorithms. Unlike simple checkers, our system doesn't just check keywords; it analyses the *source*, the *style*, the *metadata*, and the *consistency* of the content. This detailed forensic approach ensures high accuracy, significantly reducing false positives and empowering users with actionable insights. This tool is your shield against the accelerating speed of digital deception.</p>
+                <p class="read-more">The core goal is to provide a transparent, easy-to-use, and highly detailed report that reveals the probability of content being fabricated, synthesized, or manipulated. Our engine is continuously trained on vast, evolving datasets of known fakes and genuine content to stay ahead of new generative AI models. The system works as follows:</p>
+                <ul class="detail-list">
+                    <li><i class="fas fa-cogs motion-icon"></i> **Feature Extraction:** Breaks down input (text, image, video) into thousands of measurable features.</li>
+                    <li><i class="fas fa-bezier-curve motion-icon"></i> **Model Analysis:** Passes features through specialized ML models (CNNs for images, LSTMs for text).</li>
+                    <li><i class="fas fa-chart-line motion-icon"></i> **Risk Scoring:** Combines model outputs into a unified, easy-to-understand authenticity score.</li>
+                </ul>
+                <p>We believe that digital literacy starts with verifiable facts. TruthVision AI is your partner in maintaining a factual and trustworthy online presence.</p>
+            </div>
+        </section>
+
+        <section id="capabilities" class="capabilities-section section-glow" data-animation="fade-in">
+            <div class="section-content-wrapper">
+                <h3>✨ Next-Generation Verification Features</h3>
+                <p class="description-text">Explore the specialized analysis modes that power TruthVision AI's forensic capabilities.</p>
+                <div class="feature-grid">
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-book-open"></i>
+                        <h4>Article & Text Deep Check</h4>
+                        <p>Advanced NLP to spot human-written vs. machine-generated articles, focusing on semantic coherence and style anomalies.</p>
+                    </div>
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-lock"></i>
+                        <h4>Third-Party App Security Scan</h4>
+                        <p>Analyzes app manifests, permissions, and network behaviour to detect malware, excessive tracking, and suspicious activity.</p>
+                    </div>
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-globe"></i>
+                        <h4>Geospatial & Contextual Verification</h4>
+                        <p>Compares visual data against known satellite imagery and public records to verify the location and timeline of events.</p>
+                    </div>
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-microphone"></i>
+                        <h4>Audio Synthesis Detection</h4>
+                        <p>Examines voice recordings for subtle digital artifacts indicative of AI voice cloning and deep synthesis techniques.</p>
+                    </div>
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-camera-retro"></i>
+                        <h4>Reverse Image Search (Enhanced)</h4>
+                        <p>Beyond standard search: traces image history, original sources, and identifies previous manipulations across the web.</p>
+                    </div>
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <h4>Real-Time API Integration</h4>
+                        <p>Developers can integrate our powerful engine directly into their own platforms for instant, scalable verification services.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="workflow-section section-glow" data-animation="fade-in">
+            <div class="section-content-wrapper">
+                <h3>⚙️ The TruthVision AI Workflow: How We Verify</h3>
+                <p class="description-text">Our multi-stage verification process ensures maximum accuracy and reliability.</p>
+                <div class="feature-grid">
+                    <div class="feature-card animated-card">
+                        <i class="fas fa-inbox"></i>
+                        <h4>Input & Ingestion</h4>
+                        <p>Accept text, images, videos, and app data for analysis. Support for multiple formats and sources.</p>
+                    </div>
+                    <div class="feature-card animated-card">
+                        <i class="fas fa-cogs"></i>
+                        <h4>Feature Engineering</h4>
+                        <p>Normalize and tokenize data into thousands of measurable features for ML processing.</p>
+                    </div>
+                    <div class="feature-card animated-card">
+                        <i class="fas fa-brain"></i>
+                        <h4>Multi-Modal Analysis</h4>
+                        <p>Run CNNs for images, LSTMs for text, and behavioral trees in parallel simultaneously.</p>
+                    </div>
+                    <div class="feature-card animated-card">
+                        <i class="fas fa-chart-pie"></i>
+                        <h4>Bayesian Fusion</h4>
+                        <p>Combine model outputs using advanced fusion algorithms into final authenticity score.</p>
+                    </div>
+                    <div class="feature-card animated-card">
+                        <i class="fas fa-fingerprint"></i>
+                        <h4>Risk Indicators</h4>
+                        <p>Generate detailed forensic report highlighting specific manipulation points and artifacts.</p>
+                    </div>
+                    <div class="feature-card animated-card">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>Verification Report</h4>
+                        <p>Deliver clear, actionable results with confidence scores and detailed explanations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="use-cases" class="use-cases-section section-glow" data-animation="fade-in">
+            <div class="section-content-wrapper">
+                <h3> Who Needs TruthVision AI? Professional Use Cases</h3>
+                <div class="feature-grid three-columns">
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-user-tie"></i>
+                        <h4>Journalism & Media</h4>
+                        <p>Verify viral media and critical sources before publication to maintain journalistic integrity and avoid spreading hoaxes.</p>
+                    </div>
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-university"></i>
+                        <h4>Academic Research</h4>
+                        <p>Ensure data integrity in research papers, identify manipulated datasets, and confirm the authenticity of historical records.</p>
+                    </div>
+                    <div class="feature-card animated-card motion-element">
+                        <i class="fas fa-gavel"></i>
+                        <h4>Legal & Forensic Teams</h4>
+                        <p>Provide evidence of media manipulation or fraud in court proceedings using scientifically verifiable detection reports.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="future" class="future-section section-dark" data-animation="slide-up">
+            <div class="section-content-wrapper description-block">
+                <h3>Future Roadmap: What's Next for TruthVision AI</h3>
+                <p>We are constantly expanding the capabilities of TruthVision AI to tackle emerging threats. Our roadmap focuses on integrating detection mechanisms for the next generation of synthetic content. We aim to establish the industry standard for content verification.</p>
+                <ul class="detail-list large-symbols">
+                    <li><i class="fas fa-vr-cardboard motion-icon"></i> **Metaverse & AR Content Check:** Developing tools to verify authenticity within augmented and virtual reality environments.</li>
+                    <li><i class="fas fa-fingerprint motion-icon"></i> **Blockchain Provenance:** Integrating immutable ledger technology to track the origin and modification history of media files.</li>
+                    <li><i class="fas fa-hand-holding-usd motion-icon"></i> **Financial Fraud Detection:** Specialized models for identifying manipulated financial documents, statements, and market analysis reports.</li>
+                    <li><i class="fas fa-network-wired motion-icon"></i> **Real-time Social Media Monitoring:** Offering enterprise solutions to monitor social media feeds and flag suspicious content instantly at massive scale.</li>
+                </ul>
+                <p>TruthVision AI is more than a tool; it is a commitment to a transparent digital future. Your feedback helps us build a more secure web.</p>
+            </div>
+        </section>
+        
+        <section id="contact" class="contact-section section-glow" data-animation="fade-in">
+            <div class="section-content-wrapper">
+                <h3>Get in Touch with the Project Lead</h3>
+                <div class="contact-card animated-card">
+                    <div class="contact-info-grid">
+                        <div class="contact-item">
+                            <i class="fas fa-project-diagram"></i>
+                            <div>
+                                <strong>Project Name:</strong>
+                                <p>TruthVision AI</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-user-circle"></i>
+                            <div>
+                                <strong>Developer:</strong>
+                                <p>Chetan Kumawat</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-university"></i>
+                            <div>
+                                <strong>Institution:</strong>
+                                <p>Mahakal Institute of Technology & Management</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <strong>Email:</strong>
+                                <p><a href="mailto:chetankumawat585@gmail.com">chetankumawat585@gmail.com</a></p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-code-branch"></i>
+                            <div>
+                                <strong>GitHub:</strong>
+                                <p><a href="#">View Repository</a></p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-briefcase"></i>
+                            <div>
+                                <strong>Portfolio:</strong>
+                                <p><a href="#">View Portfolio</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 TruthVision AI Project. | Designed for Professional College Presentation. | Version 2.1</p>
+    </footer>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> My Profile</h2>
+                <button class="close-modal" onclick="closeProfile()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form" class="profile-form">
+                    <div class="form-group">
+                        <label for="profile-username"><i class="fas fa-user-circle"></i> Username</label>
+                        <input type="text" id="profile-username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-email"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="profile-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-firstname"><i class="fas fa-id-card"></i> First Name</label>
+                        <input type="text" id="profile-firstname" name="firstname">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-lastname"><i class="fas fa-id-card"></i> Last Name</label>
+                        <input type="text" id="profile-lastname" name="lastname">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-bio"><i class="fas fa-info-circle"></i> Bio</label>
+                        <textarea id="profile-bio" name="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" onclick="closeProfile()">Cancel</button>
+                        <button type="submit" class="save-btn glow-button">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
