@@ -18,6 +18,9 @@ uploads/
 *.avi
 *.mov
 
+# Keep this app asset in source control
+!AI_Deepfake_Detector_Logo1.png
+
 # OS files
 .DS_Store
 Thumbs.db
